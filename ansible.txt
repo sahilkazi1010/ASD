@@ -1,0 +1,145 @@
+# Practical 5: Provisioning and Configuration Management Using Ansible
+
+## Aim
+To perform software provisioning and configuration management on localhost using Ansible.
+
+## Requirements
+- Windows with Ubuntu installed through WSL
+- Internet connection
+- Ansible
+- Ubuntu package manager (`apt`)
+
+## Step 1: Open Ubuntu
+
+Open Command Prompt and run:
+
+```bash
+wsl -d Ubuntu
+```
+
+## Step 2: Update the package list
+
+```bash
+sudo apt update
+```
+
+## Step 3: Install Ansible
+
+```bash
+sudo apt install ansible -y
+```
+
+## Step 4: Verify Ansible installation
+
+```bash
+ansible --version
+```
+
+Confirm that Ansible's version information is displayed.
+
+## Step 5: Create a practical directory
+
+```bash
+mkdir ansible-practical
+cd ansible-practical
+```
+
+## Step 6: Create the Ansible playbook
+
+Create a file named `playbook.yml`:
+
+```bash
+nano playbook.yml
+```
+
+Enter the following code:
+
+```yaml
+---
+- name: Provision localhost
+  hosts: localhost
+  connection: local
+  become: yes
+
+  tasks:
+    - name: Install tree
+      apt:
+        name: tree
+        state: present
+
+    - name: Create practical directory
+      file:
+        path: /tmp/ansible-practical
+        state: directory
+        mode: '0755'
+```
+
+Save the file using `Ctrl + O`, press `Enter`, and exit using `Ctrl + X`.
+
+## Step 7: Execute the playbook
+
+Run:
+
+```bash
+ansible-playbook playbook.yml --ask-become-pass
+```
+
+Enter your Ubuntu password when prompted.
+
+If administrator privileges are already available, you may run:
+
+```bash
+ansible-playbook playbook.yml
+```
+
+## Step 8: Verify the directory
+
+Run:
+
+```bash
+ls -ld /tmp/ansible-practical
+```
+
+Confirm that the directory exists.
+
+## Step 9: Verify the tree installation
+
+Run:
+
+```bash
+tree --version
+```
+
+Confirm that the installed version is displayed.
+
+## Step 10: Check the execution result
+
+At the end of the playbook output, check the `PLAY RECAP` section.
+
+Example:
+
+```text
+PLAY RECAP
+localhost : ok=3 changed=0 unreachable=0 failed=0
+```
+
+The exact `ok` and `changed` values may vary between runs. The important result is `failed=0`.
+
+## Result
+
+Successfully executed an Ansible playbook to provision localhost by ensuring that the `tree` package was installed and the required directory was created.
+
+## Conclusion
+
+Ansible automates software provisioning and configuration management through playbooks written in YAML. The playbook was executed successfully on localhost.
+
+## Important Commands
+
+| Command | Purpose |
+|---|---|
+| `ansible --version` | Check Ansible installation |
+| `mkdir ansible-practical` | Create a working directory |
+| `nano playbook.yml` | Create or edit the playbook |
+| `ansible-playbook playbook.yml --ask-become-pass` | Execute the playbook with a privilege password prompt |
+| `ls -ld /tmp/ansible-practical` | Verify directory creation |
+| `tree --version` | Verify tree installation |
