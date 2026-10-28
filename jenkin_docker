@@ -1,0 +1,77 @@
+Step 1: Check prerequisites
+Make sure these are running:
+- Jenkins: http://localhost:8080
+- Docker Desktop: open and running
+- GitHub repository: https://github.com/sahilkazi1010/shopease
+Step 2: Add a Jenkinsfile to your GitHub repository
+Open your shopease repository on GitHub, click Add file → Create new file, and name it exactly:
+
+Jenkinsfile
+
+Paste this code:
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/sahilkazi1010/shopease.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t shopease .'
+            }
+        }
+
+        stage('Deploy Using Docker') {
+            steps {
+                bat 'docker rm -f shopease-container || exit /b 0'
+                bat 'docker run -d --name shopease-container -p 8082:80 shopease'
+            }
+        }
+    }
+}
+
+
+
+Click Commit changes to save the file to the main branch.
+
+Important: This example assumes Jenkins runs on Windows and can access Docker Desktop. If Jenkins runs as a Windows service, make sure its service account can access Docker. If you run Jenkins in a Linux container, the commands and Docker access setup will be different.
+Step 3: Create a Jenkins pipeline
+1. Open http://localhost:8080.
+2. Click New Item.
+3. Enter the name Docker_Deploy_Pipeline.
+4. Select Pipeline and click OK.
+5. Scroll to the Pipeline section.
+6. Set Definition to Pipeline script from SCM.
+7. Set SCM to Git.
+8. Enter the repository URL:
+   
+   https://github.com/sahilkazi1010/shopease.git
+9. Set Branch Specifier to */main.
+10. Set Script Path to Jenkinsfile.
+11. Click Save.
+Step 4: Run the pipeline
+1. Open Docker_Deploy_Pipeline.
+2. Click Build Now.
+3. Click the build number under Build History.
+4. Select Console Output.
+5. Check that the Checkout, Build Docker Image, and Deploy Using Docker stages complete successfully.
+Step 5: Verify the deployment
+Open Command Prompt and run:
+docker ps
+
+
+You should see a container named shopease-container.
+
+Open these URLs in your browser:
+- Main page: http://localhost:8082
+- Product page: http://localhost:8082/product.html
+Step 6: Practical result
+Result: Successfully created a Jenkins pipeline that retrieves a Jenkinsfile from a remote GitHub repository, builds a Docker image of the web application, and deploys the application inside a Docker container.
+
+If the build fails, send me a screenshot of the Console Output. We'll fix the exact error rather than changing everything at once.
