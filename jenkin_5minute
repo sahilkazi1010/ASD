@@ -1,0 +1,85 @@
+Practical 3 — Step-by-step
+Step 1: Create a GitHub repository
+1. Open GitHub.
+2. Create a repository named jenkin_prac.
+3. Add a file named Jenkinsfile in the root of the repository.
+4. Paste this code and commit it to the main branch.
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Getting source code from GitHub'
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building the project'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Testing the project'
+            }
+        }
+    }
+}
+
+
+
+Step 2: Create a Jenkins pipeline job
+1. Open Jenkins at http://localhost:8080.
+2. Click New Item.
+3. Enter the name jenkin_prac.
+4. Select Pipeline and click OK.
+Step 3: Configure the GitHub repository
+Scroll to the Pipeline section and set:
+- Definition: Pipeline script from SCM
+- SCM: Git
+- Repository URL: https://github.com/sahilkazi1010/jenkin_prac.git
+- Credentials: None, if the repository is public
+- Branch Specifier: */main
+- Script Path: Jenkinsfile
+- Lightweight checkout: Checked
+Step 4: Enable automatic polling
+Under Build Triggers:
+1. Tick Poll SCM.
+2. Enter this schedule:
+H/5 * * * *
+
+
+3. Click Save.
+
+This tells Jenkins to check the repository approximately every five minutes.
+Step 5: Run the first build
+1. Click Build Now.
+2. Open the build number under Build History.
+3. Click Console Output.
+4. Confirm that you see the Checkout, Build and Test stages and Finished: SUCCESS.
+This verifies that the pipeline runs successfully.
+Step 6: Test automatic triggering
+1. Open your Jenkinsfile on GitHub.
+2. Change the Build message to:
+   
+   echo 'Building project updated'
+3. Click Commit changes.
+4. Return to Jenkins and wait up to five minutes without clicking Build Now.
+5. Refresh Build History and check whether a new build appears.
+6. Open its Console Output and look for Building project updated.
+If the new build appears automatically, polling works!
+
+If it doesn't appear: Check the Git Polling Log and confirm the repository URL and main branch. You can still use Build Now to run the pipeline manually, but remember that manual execution alone does not prove automatic triggering works.
+Step 7: What to explain in your viva
+- Jenkins: An automation server used for CI/CD.
+- Pipeline: A sequence of automated stages.
+- Jenkinsfile: A file that defines the pipeline as code.
+- GitHub integration: Allows Jenkins to retrieve source code from a repository.
+- Poll SCM: Periodically checks the repository for changes.
+- H/5 * * * *: Checks approximately every five minutes.
+- Build Now: Manually starts a build.
+- Continuous Integration (CI): Automatically integrating and validating code changes.
