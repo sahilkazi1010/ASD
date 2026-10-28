@@ -1,0 +1,187 @@
+# Practical 4: AWS Lambda Function to Store Registration Form Data in DynamoDB
+
+## Aim
+To create an AWS Lambda function that receives registration form information and stores it in an Amazon DynamoDB table.
+
+## Requirements
+- AWS account
+- AWS Lambda
+- Amazon DynamoDB
+- AWS IAM execution role with DynamoDB write permissions
+- Python runtime
+- Registration form code provided by the college
+
+## Step 1: Create a DynamoDB Table
+
+1. Sign in to the [AWS Management Console](https://console.aws.amazon.com/).
+2. Search for **DynamoDB**.
+3. Select **Tables → Create table**.
+4. Enter the following details:
+   - Table name: `RegistrationData`
+   - Partition key: `id`
+   - Key type: `String`
+5. Keep the remaining settings at their defaults.
+6. Click **Create table**.
+7. Wait until the table becomes active.
+
+## Step 2: Create an IAM Execution Role
+
+1. Open **IAM → Roles → Create role**.
+2. Select **AWS service** as the trusted entity.
+3. Select **Lambda** as the use case.
+4. Attach the `AWSLambdaBasicExecutionRole` policy for logging.
+5. Create the role with the name `LambdaDynamoDBRole`.
+6. Open the role and select **Add permissions → Create inline policy**.
+7. Open the JSON editor and enter the following policy. Replace `YOUR-ACCOUNT-ID` with your AWS account ID.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "dynamodb:PutItem",
+      "Resource": "arn:aws:dynamodb:ap-south-1:YOUR-ACCOUNT-ID:table/RegistrationData"
+    }
+  ]
+}
+```
+
+8. Click **Next**.
+9. Name the policy `RegistrationDynamoDBWrite`.
+10. Save the policy.
+
+This policy allows the Lambda function to insert records into the specified table. If the table is in another AWS region, update the ARN accordingly.
+
+## Step 3: Create an AWS Lambda Function
+
+1. Open **AWS Lambda**.
+2. Click **Create function**.
+3. Select **Author from scratch**.
+4. Enter:
+   - Function name: `RegistrationFunction`
+   - Runtime: Python 3.12 or another available Python runtime
+   - Execution role: Use an existing role
+   - Existing role: `LambdaDynamoDBRole`
+5. Click **Create function**.
+
+## Step 4: Write the Lambda Function Code
+
+1. Open `RegistrationFunction`.
+2. Select the **Code** tab.
+3. Open `lambda_function.py`.
+4. Replace the existing code with:
+
+```python
+import json
+import boto3
+import uuid
+
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("RegistrationData")
+
+def lambda_handler(event, context):
+    body = event.get("body")
+
+    if isinstance(body, str):
+        body = json.loads(body)
+    elif body is None:
+        body = event
+
+    item = {
+        "id": str(uuid.uuid4()),
+        "name": body.get("name", "Student"),
+        "email": body.get("email", "student@example.com")
+    }
+
+    table.put_item(Item=item)
+
+    return {
+        "statusCode": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps({
+            "message": "Registration successful",
+            "data": item
+        })
+    }
+```
+
+5. Click **Deploy**.
+
+**Note:** This example stores `name` and `email`. If your college provides registration form code with additional fields, update the Lambda code to read and store those fields as well.
+
+## Step 5: Create a Test Event
+
+1. Click **Test** in the Lambda console.
+2. Select **Create new event**.
+3. Enter the event name: `RegistrationTest`.
+4. Set the invocation type to **Synchronous**, if prompted.
+5. Set event sharing to **Private**.
+6. Enter the following JSON:
+
+```json
+{
+  "name": "Sahil",
+  "email": "sahil@example.com"
+}
+```
+
+7. Click **Save**.
+
+## Step 6: Execute the Lambda Function
+
+1. Select the saved `RegistrationTest` event.
+2. Click **Test**.
+3. Wait for the execution result.
+
+Example successful response:
+
+```json
+{
+  "statusCode": 200,
+  "body": "{\"message\": \"Registration successful\", \"data\": { ... }}"
+}
+```
+
+The response includes the registration information that the function attempted to save.
+
+## Step 7: Verify Data in DynamoDB
+
+1. Open **DynamoDB** in the AWS Console.
+2. Select the `RegistrationData` table.
+3. Click **Explore table items**.
+4. Click **Run** to scan the table.
+5. Verify that the record contains:
+   - `id`: A unique identifier
+   - `name`: The registered name
+   - `email`: The registered email address
+
+Run the Lambda test again to create another registration record.
+
+## Expected Result
+
+The Lambda function executes successfully and stores the registration information in the DynamoDB table.
+
+## Conclusion
+
+AWS Lambda was used to process registration data, and Amazon DynamoDB was used to store the information. The experiment demonstrates serverless execution and integration between AWS services.
+
+## Important Concepts
+
+| Concept | Purpose |
+|---|---|
+| AWS Lambda | Executes code without managing servers |
+| DynamoDB | Stores registration records in a NoSQL database |
+| IAM execution role | Gives Lambda permission to access AWS services |
+| `uuid.uuid4()` | Generates a unique registration ID |
+| `put_item()` | Inserts a record into DynamoDB |
+| Synchronous invocation | Waits for the Lambda function's response |
+
+## Cleanup
+
+After completing the practical, delete resources that are no longer needed to avoid unnecessary charges:
+1. Delete the Lambda function if it is no longer required.
+2. Delete the DynamoDB table if the records are no longer needed.
+3. Delete the IAM role if it was created only for this experiment.
