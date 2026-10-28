@@ -1,0 +1,55 @@
+# 1. Initialize Git
+git init
+
+# 2. Configure username and email
+git config user.name "Your Name"
+git config user.email "your-email@example.com"
+
+# 3. Create a file and write content
+echo Hello Git > hello.txt
+
+# 4. Check status
+git status
+
+# 5. Stage and commit the file
+git add hello.txt
+git commit -m "First commit"
+
+# 6. Rename current branch to main
+git branch -M main
+
+# 7. Connect to GitHub (already configured in your case)
+git remote -v
+
+# 8. Push main branch to GitHub
+git push -u origin main
+
+# 9. Create and switch to feature branch
+git branch feature
+git switch feature
+
+# 10. Modify file and show differences
+echo Feature change >> hello.txt
+git diff
+
+# 11. Stage, commit, and push feature branch
+git add hello.txt
+git commit -m "Update feature branch"
+git push -u origin feature
+
+# 12. Switch back to main
+git switch main
+
+# 13. Pull latest changes from GitHub
+git pull origin main
+
+# 14. Merge feature into main
+git merge feature
+
+# 15. Push merged changes to GitHub
+git push origin main
+
+# 16. Verify repository status and branches
+git status
+git branch
+git diff
