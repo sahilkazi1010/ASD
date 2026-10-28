@@ -1,0 +1,118 @@
+Step 1 — Create a GitHub repository
+Completed
+Repository: sahil-ecommerce-team/e-commerce
+
+You created the repository under your GitHub organization and added a README file.
+
+For a new repository, the procedure is:
+1. Sign in to GitHub.
+2. Click + → New repository.
+3. Enter a repository name.
+4. Choose Public or Private as required.
+5. Select Add a README file.
+6. Click Create repository.
+
+
+
+Step 2 — Create a Jira project
+Completed
+Your project is ECommerce Project, with key ECOM.
+
+To create a project from scratch:
+1. Sign in to Jira.
+2. Select Projects or Spaces, depending on the interface.
+3. Choose Create project/space.
+4. Select the Scrum template.
+5. Enter the name ECommerce Project.
+6. Use the key ECOM if Jira allows you to set it.
+7. Create the project.
+
+
+
+Step 3 — Create tasks and organize a sprint
+Completed
+You created these tasks:
+- ECOM-4 — Develop Product Page
+- ECOM-5 — Test Checkout Process
+You also created Sprint 1.
+
+For a new task:
+1. Open your Jira project.
+2. Open Backlog.
+3. Click Create issue or the add-task option.
+4. Enter the task summary.
+5. Assign it to the appropriate sprint.
+6. Create additional tasks for the project.
+7. Start the sprint when you are ready to demonstrate active sprint tracking.
+
+
+
+Step 4 — Connect Jira with GitHub
+Connection configured
+You installed and configured GitHub for Atlassian.
+
+The procedure for a new setup is:
+1. Open Jira administration.
+2. Go to Apps → Manage apps.
+3. Open GitHub for Atlassian.
+4. Open its GitHub configuration.
+5. Connect your GitHub organization.
+6. Select the repository that Jira should access.
+7. Confirm the connection and repository permissions.
+Your current configuration shows sahil-ecommerce-team, and you confirmed that e-commerce is selected.
+
+
+
+Step 5 — Create a development branch and commit
+Completed
+You created the branch:
+
+ECOM-4-Develop-Product-Page
+
+Then you updated README.md and committed the change.
+
+For a new branch through Jira:
+1. Open the relevant task, such as ECOM-4.
+2. Expand Development.
+3. Select Create branch → Create branch in GitHub.
+4. Follow the prompts to create the branch.
+5. Open GitHub and select the new branch.
+6. Edit a file, save the changes, and commit them to that branch.
+Verification: Your GitHub page showed the branch and the Update README.md commit. The fact that Jira's Development panel still shows its action options does not, by itself, prove the integration is broken.
+
+
+
+Step 6 — Launch an AWS EC2 instance
+Completed
+You launched an EC2 instance named e-commerce-server in the Mumbai region (ap-south-1). It was running, with status checks passed.
+
+For a new instance:
+1. Sign in to the AWS Management Console.
+2. Open EC2 → Instances → Launch instances.
+3. Enter a name, such as e-commerce-server.
+4. Select Amazon Linux 2023.
+5. Choose an appropriate instance type, such as t3.micro, if suitable for your account and workload.
+6. Create or select a key pair if needed for your chosen connection method.
+7. Configure the security group with only the required inbound traffic.
+8. Launch the instance.
+9. Wait until its state is Running and status checks pass.
+10. Use Connect → EC2 Instance Connect if available to open a browser-based terminal.
+You also installed Git and updated the EC2 system packages.
+
+
+
+Step 7 — Deploy a working website to AWS
+Not completed
+This is the remaining part if you want to demonstrate an actual deployment.
+
+The general procedure is:
+1. Prepare working website source code.
+2. Push the source code to GitHub.
+3. Connect to EC2.
+4. Install the web server and required runtime.
+5. Copy or clone the application files to the server.
+6. Configure the application to run.
+7. Configure the security group to allow HTTP traffic on port 80 if appropriate.
+8. Open the public IP address in a browser.
+9. Verify that the website loads.
+Since your current repository contains the README rather than a complete website, you must add working application code before completing this step.
