@@ -1,0 +1,52 @@
+Practical 6: Deploy an E-Commerce Web Application Using Docker
+Step 1: Start Docker
+1. Open Docker Desktop.
+2. Wait until Docker Engine is running.
+3. Open CMD and run:
+docker --version
+docker ps
+
+
+Step 2: Clone the GitHub repository
+git clone https://github.com/sahilkazi1010/shopease.git
+cd shopease
+
+
+If you have already cloned the repository, open CMD in the existing shopease folder instead.
+Step 3: Check project files
+dir
+
+
+Confirm that Dockerfile, index.html, product.html, README.md, css, and js are present.
+Step 4: Build the Docker image
+docker build -t shopease .
+
+
+Wait until the build finishes successfully.
+Step 5: Run the Docker container
+docker run -d --name shopease-container -p 8082:80 shopease
+
+
+Step 6: Verify the container
+docker ps
+docker images
+
+
+Confirm that shopease-container is running.
+Step 7: Open the website
+Open Chrome and visit:
+- Home page: http://localhost:8082
+- Product page: http://localhost:8082/product.html
+Check that both pages load and that navigation between them works.
+Step 8: Display the deployment in Docker Desktop
+1. Open Docker Desktop.
+2. Click Containers.
+3. Find shopease-container.
+4. Confirm its status is running.
+5. Show the running container and website to your examiner.
+Step 9: Stop the container after the practical
+docker stop shopease-container
+
+
+To run it again later:
+docker start shopease-container
