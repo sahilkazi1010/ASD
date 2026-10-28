@@ -1,0 +1,141 @@
+Airflow Practical 9 — Complete Step-by-Step Instructions
+Part 1: Start Docker Desktop
+1. Press the Windows key.
+2. Type Docker Desktop.
+3. Click Docker Desktop.
+4. Wait until Docker shows that it is running.
+5. Keep Docker Desktop open.
+Part 2: Start the Airflow server
+1. Press the Windows key.
+2. Type Command Prompt.
+3. Open Command Prompt.
+4. Type this command:
+cd C:\airflow-practical
+
+
+5. Press Enter.
+6. Type:
+docker compose ps
+
+
+7. Press Enter.
+8. Check whether the Airflow containers are listed.
+9. Type:
+docker compose up -d
+
+
+10. Press Enter.
+11. Wait for the command to finish.
+12. Type:
+docker compose ps
+
+
+13. Press Enter.
+14. Check that the Airflow API server and scheduler are running.
+Part 3: Open Airflow in your browser
+1. Open Google Chrome.
+2. Click the address bar.
+3. Type http://localhost:8081.
+4. Press Enter.
+5. Wait for the Airflow login page.
+6. Enter username airflow.
+7. Enter password airflow.
+8. Click Sign In.
+If the login fails, use the credentials configured for your existing Airflow installation.
+Part 4: Open the Airflow project folder
+1. Press Windows + E.
+2. Open File Explorer.
+3. Click the address bar.
+4. Type:
+C:\airflow-practical
+
+
+5. Press Enter.
+6. Check whether a folder named dags exists.
+7. If dags exists, open it.
+8. If dags does not exist, right-click an empty area.
+9. Click New.
+10. Click Folder.
+11. Name the folder dags.
+12. Press Enter.
+13. Open the dags folder.
+Part 5: Create the DAG Python file
+1. Press the Windows key.
+2. Type Notepad.
+3. Open Notepad.
+4. Copy and paste the following code.
+import pendulumfrom airflow.sdk import dag, task@dag(    dag_id="display_date_time",    schedule="30 9 * * 3",    start_date=pendulum.datetime(2026, 10, 28, tz="Asia/Kolkata"),    catchup=False,    tags=["practical"])def display_date_time():    @task    def print_date_time():        current_time = pendulum.now("Asia/Kolkata")        print("Current Date:", current_time.format("YYYY-MM-DD"))        print("Current Time:", current_time.format("HH:mm:ss"))    print_date_time()display_date_time()
+
+
+
+5. Click File.
+6. Click Save As.
+7. Navigate to C:\airflow-practical\dags.
+8. In File name, type:
+date_time_dag.py
+
+
+9. In Save as type, select All Files.
+10. Click Save.
+11. Close Notepad.
+12. Open File Explorer.
+13. Open C:\airflow-practical\dags.
+14. Check that date_time_dag.py is present.
+Part 6: Refresh the Airflow server
+1. Open Command Prompt.
+2. Type:
+cd C:\airflow-practical
+
+
+3. Press Enter.
+4. Type:
+docker compose up -d
+
+
+5. Press Enter.
+6. Wait for the command to finish.
+7. Open Chrome.
+8. Go to http://localhost:8081.
+9. Refresh the page.
+10. Wait for the DAG list to load.
+Part 7: Find and enable the DAG
+1. Open the Airflow DAGs page.
+2. Find the DAG named display_date_time.
+3. If you cannot find it, wait briefly and refresh the page.
+4. If it still does not appear, return to Command Prompt.
+5. Run:
+docker compose logs --tail=100 airflow-dag-processor
+
+
+6. Press Enter and check for errors.
+7. Once display_date_time appears, find its toggle.
+8. Turn the toggle on if it is paused.
+Part 8: Run the DAG manually
+1. Click display_date_time.
+2. Click Trigger DAG.
+3. Confirm the trigger if prompted.
+4. Open the DAG's Grid or Graph view.
+5. Find the task named print_date_time.
+6. Wait until the task finishes.
+7. Click the task.
+8. Open Logs.
+9. Check the displayed date and time.
+Expected log format:
+Current Date: YYYY-MM-DD
+Current Time: HH:mm:ss
+
+
+Part 9: Verify the Wednesday schedule
+1. Return to the display_date_time DAG page.
+2. Find the schedule information.
+3. Confirm the schedule is 30 9 * * 3.
+4. Confirm the timezone is Asia/Kolkata.
+5. Leave the DAG enabled.
+The DAG is scheduled to run every Wednesday at 9:30 AM IST. The manual trigger tests the task immediately; it does not change the recurring schedule.
+Part 10: Capture evidence for your practical journal
+1. Capture a screenshot of Docker Desktop showing the running Airflow containers.
+2. Capture a screenshot of the Airflow DAG list showing display_date_time.
+3. Capture a screenshot of the DAG schedule.
+4. Capture a screenshot of the successful print_date_time task.
+5. Capture a screenshot of the task logs showing the date and time.
+Result: The Airflow server is configured, and the display
