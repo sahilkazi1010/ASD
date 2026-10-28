@@ -1,0 +1,182 @@
+1. Install Terraform
+
+2. Configure AWS credentials
+
+3. Write main.tf
+
+4. Run Terraform to create EC2
+
+5. Verify in AWS Console
+
+
+Step 1: Install Terraform on Windows
+1. Open the official Terraform installation page. 
+   HashiCorp Developer
+2. Under Windows, download the AMD64 ZIP file for a typical 64-bit Intel/AMD laptop.
+3. Extract terraform.exe into C:\terraform.
+4. Add C:\terraform to your Windows Path environment variable.
+5. Close and reopen Command Prompt, then run:
+terraform -version
+
+
+If it displays a Terraform version, installation is successful.
+Step 2: Install AWS CLI and configure credentials
+Download and install the official AWS CLI for Windows. 
+AWS Command Line Interface
+
+
+Open Command Prompt:
+aws --version
+aws configure
+
+
+Enter your AWS IAM access key ID, secret access key, default region and output format:
+AWS Access Key ID: YOUR_ACCESS_KEY
+AWS Secret Access Key: YOUR_SECRET_KEY
+Default region name: ap-south-1
+Default output format: json
+
+
+Use credentials from an IAM identity authorized to create EC2 instances. Never share your secret access key. If you already configured the AWS CLI, you can skip this step.
+
+Verify your credentials:
+aws sts get-caller-identity
+
+
+You should see your AWS account and identity information.
+Step 3: Create the Terraform project
+Run these commands in Command Prompt:
+mkdir C:\terraform-ec2
+cd C:\terraform-ec2
+notepad main.tf
+
+
+If Notepad asks whether to create the file, click Yes.
+
+Paste the following code into main.tf:
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023.*-x86_64"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+}
+
+resource "aws_instance" "my_ec2" {
+  ami           = data.aws_ami.amazon_linux.id
+  instance_type = "t3.micro"
+
+  tags = {
+    Name = "Terraform-EC2"
+  }
+}
+
+output "instance_id" {
+  value = aws_instance.my_ec2.id
+}
+
+output "public_ip" {
+  value = aws_instance.my_ec2.public_ip
+}
+
+
+
+Save the file and close Notepad.
+
+This configuration selects a current Amazon Linux 2023 AMI in Mumbai (ap-south-1) and provisions an EC2 instance. It does not open inbound network ports.
+Step 4: Initialize Terraform
+In the same Command Prompt window, run:
+terraform init
+
+
+Wait for the message indicating that Terraform has initialized successfully.
+Step 5: Validate the configuration
+terraform validate
+
+
+Expected result:
+Success! The configuration is valid.
+
+
+Step 6: Preview the changes
+terraform plan
+
+
+Check that Terraform plans to create one EC2 instance.
+Step 7: Provision the EC2 instance
+Run:
+terraform apply
+
+
+Terraform will show the proposed changes. Type:
+yes
+
+
+Wait until the operation finishes. Terraform should display the new instance ID and public IP address.
+
+Important: AWS charges may apply, depending on your account, instance eligibility and usage. Confirm the cost before approving the deployment.
+Step 8: Verify in AWS Console
+
+
+
+
+
+
+
+
+
+1. Open EC2
+
+Go to the AWS EC2 Console and select the Mumbai region.
+
+
+
+
+
+
+
+
+
+
+
+2. Find the instance
+
+Open Instances and find the instance named Terraform-EC2. Confirm that its state is Running.
+
+
+
+You can also check the instance from Command Prompt:
+terraform output
+
+
+Step 9: Clean up after the practical
+When you're finished and no longer need the instance, run this inside C:\terraform-ec2:
+terraform destroy
+
+
+Type yes to confirm. This removes the EC2 instance managed by this configuration and helps prevent ongoing charges.
+Practical write-up
+- Aim: To install Terraform and provision an Amazon EC2 instance on AWS using Infrastructure as Code.
+- Requirements: Terraform, AWS CLI, AWS credentials, an AWS account and Command Prompt.
+- Result: An EC2 instance was provisioned on AWS using Terraform and verified in the AWS Management Console.
