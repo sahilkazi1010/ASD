@@ -1,0 +1,175 @@
+# Practical 8: Store Date and Time in DynamoDB Using AWS Lambda
+
+## Aim
+To create an AWS Lambda function that captures the current date and time during execution and stores the information in an Amazon DynamoDB table.
+
+## Requirements
+- AWS account
+- AWS Lambda
+- Amazon DynamoDB
+- AWS IAM execution role with DynamoDB write permissions
+- Python runtime
+
+## Step 1: Create a DynamoDB Table
+
+1. Sign in to the [AWS Management Console](https://console.aws.amazon.com/).
+2. Search for **DynamoDB**.
+3. Select **Tables** and click **Create table**.
+4. Enter the following details:
+
+   - Table name: `ExecutionTime`
+   - Partition key: `id`
+   - Key type: `String`
+
+5. Keep the remaining settings at their defaults.
+6. Click **Create table**.
+7. Wait until the table becomes active.
+
+## Step 2: Create an IAM Execution Role
+
+1. Open **IAM → Roles**.
+2. Click **Create role**.
+3. Select **AWS service** as the trusted entity.
+4. Select **Lambda** as the use case.
+5. Attach the `AWSLambdaBasicExecutionRole` policy for logging.
+6. Create the role with the name `StoreExecutionTimeRole`.
+7. Open the newly created role.
+8. Click **Add permissions → Create inline policy**.
+9. Select the **JSON** tab and enter the following policy. Replace `YOUR-ACCOUNT-ID` with your 12-digit AWS account ID.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "dynamodb:PutItem",
+      "Resource": "arn:aws:dynamodb:ap-south-1:YOUR-ACCOUNT-ID:table/ExecutionTime"
+    }
+  ]
+}
+```
+
+10. Click **Next**, name the policy `ExecutionTimeWritePolicy`, and save it.
+
+**Note:** This policy assumes the DynamoDB table is in the Mumbai region (`ap-south-1`). Use the actual region if your table is elsewhere.
+
+## Step 3: Create an AWS Lambda Function
+
+1. Open **AWS Lambda**.
+2. Click **Create function**.
+3. Select **Author from scratch**.
+4. Enter these details:
+
+   - Function name: `StoreExecutionTime`
+   - Runtime: Python 3.12, or another available Python runtime
+   - Execution role: Use an existing role
+   - Existing role: `StoreExecutionTimeRole`
+
+5. Click **Create function**.
+
+Make sure the Lambda function and DynamoDB table are in the same AWS region.
+
+## Step 4: Write the Lambda Function Code
+
+1. Open `StoreExecutionTime`.
+2. Go to the **Code** tab.
+3. Open `lambda_function.py`.
+4. Replace the existing code with the following:
+
+```python
+import json
+import boto3
+from datetime import datetime, timezone
+import uuid
+
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("ExecutionTime")
+
+def lambda_handler(event, context):
+    current_time = datetime.now(timezone.utc).isoformat()
+
+    item = {
+        "id": str(uuid.uuid4()),
+        "date_time": current_time
+    }
+
+    table.put_item(Item=item)
+
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "message": "Date and time stored successfully",
+            "date_time": current_time
+        })
+    }
+```
+
+5. Click **Deploy** to save the code.
+
+## Step 5: Create a Test Event
+
+1. Click **Test** in the Lambda console.
+2. Select **Create new event**.
+3. Enter the event name: `TimeTest`.
+4. Use `{}` as the test event JSON.
+5. Select synchronous invocation if prompted.
+6. Keep the event sharing setting as **Private**.
+7. Click **Save**.
+
+## Step 6: Execute the Lambda Function
+
+1. Select the saved `TimeTest` event.
+2. Click **Test**.
+3. Wait for the execution result.
+
+An example successful response is:
+
+```json
+{
+  "statusCode": 200,
+  "body": "{\"message\": \"Date and time stored successfully\", \"date_time\": \"2026-10-29T08:30:00+00:00\"}"
+}
+```
+
+The displayed timestamp is only an example. The actual date and time will depend on when the function executes. The function stores the timestamp in UTC.
+
+## Step 7: Verify the Stored Data
+
+1. Open **DynamoDB** in the AWS Console.
+2. Select the `ExecutionTime` table.
+3. Click **Explore table items**.
+4. Click **Run** to scan the table.
+5. Verify that the returned record contains:
+   - `id`: A unique identifier
+   - `date_time`: The execution timestamp in UTC
+
+Run the Lambda test again and scan the table to see another record with a new timestamp.
+
+## Expected Result
+
+The Lambda function executes successfully, captures the current date and time, and stores the information in the DynamoDB table.
+
+## Conclusion
+
+AWS Lambda was used to execute Python code without managing servers. The function captured the execution timestamp and stored it in Amazon DynamoDB using the `PutItem` operation.
+
+## Important Commands and Concepts
+
+| Concept | Purpose |
+|---|---|
+| AWS Lambda | Executes code without managing servers |
+| Amazon DynamoDB | Stores data in a NoSQL database |
+| IAM role | Grants the Lambda function permission to access AWS services |
+| `datetime.now(timezone.utc)` | Gets the current UTC date and time |
+| `uuid.uuid4()` | Generates a unique record identifier |
+| `put_item()` | Inserts an item into DynamoDB |
+| Test event `{}` | Invokes the function without additional input |
+
+## Cleanup
+
+To avoid unnecessary costs after the practical:
+
+1. Delete the `StoreExecutionTime` Lambda function if no longer needed.
+2. Delete the `ExecutionTime` DynamoDB table if its records are no longer needed.
+3. Delete the IAM role if it was created only for this experiment.
